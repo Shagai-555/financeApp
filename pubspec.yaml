@@ -38,6 +38,8 @@ dependencies:
   firebase_core: ^3.8.0
   firebase_auth: ^5.3.3
   flutter_svg: ^2.0.9
+  google_fonts: ^6.1.0
+  toastification: ^1.2.0
 
 dev_dependencies:
   flutter_test:
