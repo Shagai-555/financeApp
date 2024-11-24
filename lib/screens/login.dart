@@ -141,9 +141,9 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 24),
                 Text(
-                  'Тавтай морилно уу !',
+                  'Тавтай морилно уу',
                   style: GoogleFonts.caveat(
-                    fontSize: 4,
+                    fontSize: 40,
                     color: Colors.white,
                     fontWeight: FontWeight.w400,
                   ),
