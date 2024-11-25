@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:toastification/toastification.dart';
 import './login.dart';
+import '../widgets/custom_button.dart'; // Import the custom button
 
 class RegistrationPage extends StatefulWidget {
   const RegistrationPage({super.key});
@@ -21,23 +22,21 @@ class _RegistrationPageState extends State<RegistrationPage> {
     toastification.show(
       context: context,
       type: isError ? ToastificationType.error : ToastificationType.success,
-      style: ToastificationStyle.fillColored,
-      autoCloseDuration: const Duration(seconds: 5),
+      style: ToastificationStyle.minimal,
+      autoCloseDuration: const Duration(seconds: 1),
       description: Text(
         message,
-        style: const TextStyle(color: Colors.black),
+        style: const TextStyle(
+          color: Colors.black,
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+        ),
       ),
+      backgroundColor: Colors.white,
+      primaryColor: isError ? Colors.blue : Colors.green,
       alignment: Alignment.topRight,
       direction: TextDirection.ltr,
-      animationDuration: const Duration(milliseconds: 300),
-      icon: Icon(
-        isError ? Icons.error_outline : Icons.check_circle_outline,
-        color: Colors.white,
-      ),
-      primaryColor: isError ? Colors.red : Colors.green,
-      backgroundColor: isError ? Colors.red : Colors.green,
-      foregroundColor: Colors.white,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+      borderRadius: BorderRadius.circular(12),
     );
   }
 
@@ -130,46 +129,42 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     'Нууц үгээ баталгаажуулна уу', Icons.lock_outline,
                     isPassword: true),
                 const SizedBox(height: 24),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _register,
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      backgroundColor: Colors.white,
-                      foregroundColor: const Color(0xFF3E7C78),
-                    ),
-                    child: const Text(
-                      'Бүртгүүлэх',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
+                CustomButton(
+                  text: 'Бүртгүүлэх',
+                  onPressed: _register,
+                  backgroundColor: Colors.white,
+                  foregroundColor: const Color(0xFF3E7C78),
                 ),
                 const SizedBox(height: 16),
                 Center(
                   child: TextButton(
-                    onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const LoginPage(),
-                        ),
-                      );
-                    },
-                    child: const Text(
-                      'Хэрэглэгчийн эрх бий юу? Нэвтрэх',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const LoginPage(),
+                          ),
+                        );
+                      },
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Хэрэглэгчийн эрхтэй юу?',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                            ),
+                          ),
+                          Text(
+                            'Нэвтрэх',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      )),
                 ),
               ],
             ),

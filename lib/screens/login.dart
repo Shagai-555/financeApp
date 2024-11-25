@@ -1,7 +1,10 @@
+import 'package:finance/screens/registration.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:toastification/toastification.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:finance/screens/home_base.dart';
+import '../widgets/custom_button.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -17,18 +20,27 @@ class _LoginPageState extends State<LoginPage> {
   String _errorMessage = '';
   bool _isLoggedIn = false;
   int _counter = 0;
+  bool _isPasswordVisible = false;
 
   void _showToast(String message, {bool isError = true}) {
     toastification.show(
       context: context,
       type: isError ? ToastificationType.error : ToastificationType.success,
-      style: ToastificationStyle.flatColored,
+      style: ToastificationStyle.minimal,
+      autoCloseDuration: const Duration(seconds: 2),
       description: Text(
         message,
-        style: const TextStyle(color: Colors.black),
+        style: const TextStyle(
+          color: Colors.black,
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+        ),
       ),
+      backgroundColor: Colors.white,
+      primaryColor: isError ? Colors.red : Colors.green,
       alignment: Alignment.topRight,
       direction: TextDirection.ltr,
+      borderRadius: BorderRadius.circular(12),
     );
   }
 
@@ -39,10 +51,10 @@ class _LoginPageState extends State<LoginPage> {
         password: _passwordController.text,
       );
       if (mounted) {
-        setState(() {
-          _isLoggedIn = true;
-        });
         _showToast('Амжилттай нэвтэрлээ', isError: false);
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const HomeBase()),
+        );
       }
     } on FirebaseAuthException catch (e) {
       _showToast(e.message ?? 'Алдаа гарлаа');
@@ -184,6 +196,19 @@ class _LoginPageState extends State<LoginPage> {
                     labelStyle: const TextStyle(color: Colors.white70),
                     prefixIcon:
                         const Icon(Icons.lock_outline, color: Colors.white70),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _isPasswordVisible
+                            ? Icons.visibility
+                            : Icons.visibility_off,
+                        color: Colors.white70,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _isPasswordVisible = !_isPasswordVisible;
+                        });
+                      },
+                    ),
                     filled: true,
                     fillColor: Colors.white.withOpacity(0.2),
                     border: OutlineInputBorder(
@@ -200,7 +225,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   style: const TextStyle(color: Colors.white),
-                  obscureText: true,
+                  obscureText: !_isPasswordVisible,
                 ),
                 const SizedBox(height: 24),
                 if (_errorMessage.isNotEmpty)
@@ -215,28 +240,46 @@ class _LoginPageState extends State<LoginPage> {
                       textAlign: TextAlign.center,
                     ),
                   ),
-                // Login Button
                 SizedBox(
                   width: double.infinity,
                   height: 50,
-                  child: ElevatedButton(
+                  child: CustomButton(
+                    text: 'Нэвтрэх',
                     onPressed: _signIn,
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      backgroundColor: Colors.white,
-                      foregroundColor: primaryColor,
-                      elevation: 0,
-                    ),
-                    child: const Text(
-                      'Нэвтрэх',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    backgroundColor: Colors.white,
+                    foregroundColor: primaryColor,
                   ),
+                ),
+                const SizedBox(height: 16),
+                Center(
+                  child: TextButton(
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const RegistrationPage(),
+                          ),
+                        );
+                      },
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Бүртгэл үүсээгүй?',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                            ),
+                          ),
+                          Text(
+                            'Бүртгүүлэх',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      )),
                 ),
               ],
             ),

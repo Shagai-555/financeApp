@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import './registration.dart';
 import './login.dart';
+import '../widgets/custom_button.dart'; // Import the custom button
 
 class PreviewScreen extends StatelessWidget {
   const PreviewScreen({super.key});
@@ -69,33 +70,18 @@ class PreviewScreen extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 48),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const RegistrationPage(),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                CustomButton(
+                  text: 'Эхлэх',
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const RegistrationPage(),
                       ),
-                      backgroundColor: Colors.white,
-                      foregroundColor: const Color(0xFF3E7C78),
-                    ),
-                    child: const Text(
-                      'Эхлэх',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
+                    );
+                  },
+                  backgroundColor: Colors.white,
+                  foregroundColor: const Color(0xFF3E7C78),
                 ),
                 const SizedBox(height: 16),
                 TextButton(
