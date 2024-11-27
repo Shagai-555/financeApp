@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'home.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import './../conf.dart';
 
 class HomeBase extends StatefulWidget {
   const HomeBase({Key? key}) : super(key: key);
@@ -18,12 +20,86 @@ class _HomeBaseState extends State<HomeBase> {
     const Center(child: Text('Profile')),
   ];
 
+  String _getGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) {
+      return 'Өглөөний Мэнд'; // Good Morning
+    } else if (hour < 18) {
+      return 'Өдрийн Мэнд'; // Good Afternoon
+    } else {
+      return 'Оройн Мэнд'; // Good Evening
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('HomeBase'),
-        backgroundColor: const Color(0xFF3E7C78),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(110), // Set height for the AppBar
+        child: ClipPath(
+          clipper: UShapeClipper(), // Custom clipper for U shape
+          child: Container(
+            color: const Color.fromRGBO(47, 126, 121, 1), // Background color
+            child: AppBar(
+              backgroundColor: Colors.transparent, // Make AppBar transparent
+              leading: Column(
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      Icon(
+                        DateTime.now().hour < 12
+                            ? Icons.wb_sunny // Sun icon for morning
+                            : DateTime.now().hour < 18
+                                ? Icons.wb_cloudy // Cloud icon for afternoon
+                                : Icons.nights_stay, // Moon icon for evening
+                        color: Colors.white,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        _getGreeting(), // Use userName from Config
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 14),
+                      ),
+                    ],
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(left: 10),
+                    child: Text(
+                      Config.displayName, // Use userName from Config
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ), // Adjust leading width to fit the content
+              leadingWidth: 150,
+              actions: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: const Color.fromRGBO(
+                        255, 255, 255, 0.06), // Background color
+                    borderRadius: BorderRadius.circular(7), // Rounded corners
+                  ),
+                  margin: const EdgeInsets.only(top: 5, right: 8),
+                  child: IconButton(
+                    icon: SvgPicture.asset(
+                      'assets/notif.svg',
+                    ),
+                    onPressed: () {
+                      // Handle notification button press
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
       body: IndexedStack(
         index: _selectedIndex,
@@ -88,5 +164,24 @@ class _HomeBaseState extends State<HomeBase> {
         ),
       ),
     );
+  }
+}
+
+// Custom clipper for U shape
+class UShapeClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    var path = Path();
+    path.lineTo(0, size.height - 30); // Start from the left bottom
+    path.quadraticBezierTo(
+        size.width / 2, size.height, size.width, size.height - 30); // U shape
+    path.lineTo(size.width, 0); // Right top corner
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) {
+    return true; // Reclip whenever the widget rebuilds
   }
 }
