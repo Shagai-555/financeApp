@@ -1,9 +1,11 @@
+import 'package:finance/conf.dart';
 import 'package:finance/screens/registration.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:toastification/toastification.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:finance/screens/home_base.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../widgets/custom_button.dart';
 
 class LoginPage extends StatefulWidget {
@@ -17,9 +19,7 @@ class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _auth = FirebaseAuth.instance;
-  String _errorMessage = '';
-  bool _isLoggedIn = false;
-  int _counter = 0;
+  final String _errorMessage = '';
   bool _isPasswordVisible = false;
 
   void _showToast(String message, {bool isError = true}) {
@@ -52,6 +52,21 @@ class _LoginPageState extends State<LoginPage> {
       );
       if (mounted) {
         _showToast('Амжилттай нэвтэрлээ', isError: false);
+        final userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(FirebaseAuth.instance.currentUser?.uid)
+            .get();
+
+        if (userDoc.exists) {
+          final userData = userDoc.data();
+          if (userData != null) {
+            setState(() {
+              Config.user = FirebaseAuth.instance.currentUser;
+              Config.displayName = userData['name'] ?? 'Unknown User';
+            });
+          }
+        }
+
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => const HomeBase()),
         );
@@ -61,56 +76,10 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    final primaryColor = Color(0xFF3E7C78);
-    final secondaryColor = Color(0xFF5AB8CD);
-
-    if (_isLoggedIn) {
-      return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-          title: const Text('Home'),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.logout),
-              onPressed: () {
-                setState(() {
-                  _isLoggedIn = false;
-                  _counter = 0;
-                });
-                _auth.signOut();
-              },
-            ),
-          ],
-        ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              const Text(
-                'Та энэ товчлуурыг олон удаа дарсан:',
-              ),
-              Text(
-                '$_counter',
-                style: Theme.of(context).textTheme.headlineMedium,
-              ),
-            ],
-          ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: _incrementCounter,
-          tooltip: 'Increment',
-          child: const Icon(Icons.add),
-        ),
-      );
-    }
+    const primaryColor = Color(0xFF3E7C78);
+    const secondaryColor = Color(0xFF5AB8CD);
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -124,14 +93,11 @@ class _LoginPageState extends State<LoginPage> {
       ),
       body: Container(
         height: MediaQuery.of(context).size.height,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              primaryColor,
-              secondaryColor,
-            ],
+            colors: [primaryColor, secondaryColor],
           ),
         ),
         child: SingleChildScrollView(
@@ -145,7 +111,6 @@ class _LoginPageState extends State<LoginPage> {
               bottom: 24.0,
             ),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Image.asset(
                   'assets/login.png',
@@ -161,6 +126,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 const SizedBox(height: 32),
+
                 // Email Field
                 TextField(
                   controller: _emailController,
@@ -188,6 +154,7 @@ class _LoginPageState extends State<LoginPage> {
                   keyboardType: TextInputType.emailAddress,
                 ),
                 const SizedBox(height: 16),
+
                 // Password Field
                 TextField(
                   controller: _passwordController,
@@ -228,6 +195,7 @@ class _LoginPageState extends State<LoginPage> {
                   obscureText: !_isPasswordVisible,
                 ),
                 const SizedBox(height: 24),
+
                 if (_errorMessage.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 16),
@@ -240,6 +208,8 @@ class _LoginPageState extends State<LoginPage> {
                       textAlign: TextAlign.center,
                     ),
                   ),
+
+                // Login Button
                 SizedBox(
                   width: double.infinity,
                   height: 50,
@@ -251,35 +221,38 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 const SizedBox(height: 16),
+
+                // Registration Button
                 Center(
                   child: TextButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const RegistrationPage(),
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const RegistrationPage(),
+                        ),
+                      );
+                    },
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Бүртгэл үүсээгүй?',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
                           ),
-                        );
-                      },
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Бүртгэл үүсээгүй?',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                            ),
+                        ),
+                        Text(
+                          'Бүртгүүлэх',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
                           ),
-                          Text(
-                            'Бүртгүүлэх',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
-                      )),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ],
             ),

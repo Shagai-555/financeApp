@@ -41,6 +41,8 @@ dependencies:
   flutter_svg: ^2.0.9
   google_fonts: ^6.1.0
   toastification: ^1.2.0
+  intl: ^0.20.1
+  fl_chart: ^0.69.2
 
 dev_dependencies:
   flutter_test:

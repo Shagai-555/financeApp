@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:toastification/toastification.dart';
@@ -47,18 +48,30 @@ class _RegistrationPageState extends State<RegistrationPage> {
     }
 
     try {
+      // Create the user with email and password
       UserCredential userCredential =
           await _auth.createUserWithEmailAndPassword(
         email: _emailController.text,
         password: _passwordController.text,
       );
 
-      // Update user profile with name
+      // Update the user's display name
       await userCredential.user?.updateDisplayName(_nameController.text);
 
       if (mounted) {
+        // Set initial user data in Firestore (expenses, income, etc.)
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(FirebaseAuth.instance.currentUser?.uid)
+            .set({
+          'name': _nameController.text, // Use the user's name
+          'expenses': 0,
+          'income': 0,
+          'totalMoney': 1000000,
+        });
+
         _showToast('Амжилттай бүртгэгдлээ!', isError: false);
-        // Wait for toast to be visible before navigation
+
         Future.delayed(const Duration(seconds: 2), () {
           Navigator.pushReplacement(
             context,
